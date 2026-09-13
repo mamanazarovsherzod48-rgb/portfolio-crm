@@ -85,32 +85,37 @@ function App() {
 
   const t = translations[lang]
 
-  useEffect(() => {
-    // 1. Первичная загрузка
-    fetchClients()
+useEffect(() => {
+    // 1. Первая загрузка с лоадером
+    fetchClients(false)
 
-    // 2. Подписка на Realtime-изменения в Supabase
+    // 2. Realtime слушатель с тихим обновлением
     const channel = supabase
-      .channel('realtime-clients')
+      .channel('realtime-crm')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'clients' },
         () => {
-          // Как только пришло любое изменение (добавление, смена статуса, удаление)
-          fetchClients()
+          fetchClients(true) // Обновляем данные в фоне, скролл и экран не дергаются
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'deals' },
+        () => {
+          fetchClients(true) // Слушаем сделки тоже в тихом режиме
         }
       )
       .subscribe()
 
-    // Отписка при размонтировании компонента
     return () => {
       supabase.removeChannel(channel)
     }
   }, [])
 
-  async function fetchClients() {
+ async function fetchClients(isSilent = false) {
     try {
-      setLoading(true)
+      if (!isSilent) setLoading(true)
       const { data, error } = await supabase
         .from('clients')
         .select('*, deals(*)')
@@ -121,7 +126,7 @@ function App() {
     } catch (error) {
       console.error('Ошибка загрузки:', error.message)
     } finally {
-      setLoading(false)
+      if (!isSilent) setLoading(false)
     }
   }
 
