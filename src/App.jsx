@@ -86,7 +86,26 @@ function App() {
   const t = translations[lang]
 
   useEffect(() => {
+    // 1. Первичная загрузка
     fetchClients()
+
+    // 2. Подписка на Realtime-изменения в Supabase
+    const channel = supabase
+      .channel('realtime-clients')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'clients' },
+        () => {
+          // Как только пришло любое изменение (добавление, смена статуса, удаление)
+          fetchClients()
+        }
+      )
+      .subscribe()
+
+    // Отписка при размонтировании компонента
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   async function fetchClients() {
