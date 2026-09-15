@@ -1,16 +1,59 @@
-# React + Vite
+# ⚡ CRM Portfolio Pro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Современная, адаптивная и легковесная CRM-панель для управления клиентами, контроля текущих сделок и отслеживания ключевых показателей выручки в реальном времени. Разработана на стеке **React (Vite)** и **Supabase (PostgreSQL & Realtime)**.
 
-Currently, two official plugins are available:
+🔗 **Демо онлайн:** [https://portfolio-crm-coral.vercel.app/](https://portfolio-crm-coral.vercel.app/)  
+📁 **Репозиторий:** [https://github.com/mamanazarovsherzod48-rgb/portfolio-crm/](https://github.com/mamanazarovsherzod48-rgb/portfolio-crm/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🌟 Ключевые возможности
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **⚡ Мгновенная синхронизация между устройствами (Realtime):**
+  - Подписка на события базы данных через веб-сокеты Supabase (`postgres_changes`).
+  - **Фоновое («тихое») обновление данных:** Изменения подтягиваются без мигания экрана и лоадеров, сохраняя точное положение скролла на всех подключенных устройствах (как в Google Таблицах).
 
-## Expanding the ESLint configuration
+- **📐 Раздельная адаптивная архитектура (Dual-Mode):**
+  - **Полноэкранный режим на ПК (≥900px):** Фиксированная панель ввода данных слева и независимый внутренний скролл списка клиентов справа (страница целиком не дергается).
+  - **Мобильный режим и режим пол-экрана:** Свободный вертикальный поток с автоматическим масштабированием под любые диагонали смартфонов и планшетов без обрезания контента.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **⏱️ Алгоритм обработки лидов по принципу FIFO:**
+  - Очередь заявок выстроена по правилу First-In, First-Out (`created_at ASC`): старые необработанные лиды всегда остаются наверху списка, чтобы внимание менеджера не уходило от давних обращений.
+
+- **🌍 Мультиязычность (i18n):**
+  - Моментальное переключение интерфейса между тремя языками: **Русский (RU)**, **Английский (EN)** и **Узбекский (UZ)** без перезагрузки страницы.
+
+- **🎨 Динамическая смена темы:**
+  - Поддержка темной и светлой тем с продуманным контрастом элементов.
+
+- **🔎 Живой поиск и фильтрация:**
+  - Быстрый поиск клиентов по имени и номеру телефона в связке с фильтрами по статусам (*Все, Новые, В работе, Завершены, Отказ*).
+
+---
+
+## 🛠️ Стек технологий
+
+- **Фронтенд:** React 18, Vite, кастомный адаптивный CSS (CSS Grid & Flexbox)
+- **Бэкенд и База данных:** Supabase (PostgreSQL, Realtime WebSockets)
+- **Деплой и хостинг:** Vercel
+
+---
+
+## 🚀 Инженерные задачи и их решения
+
+1. **Устранение сброса скролла при Realtime-обновлении:**
+   - *Проблема:* Стандартное обновление сбрасывало состояние в глобальный `loading`, из-за чего список клиентов на доли секунды исчезал, а скролл страницы сбивался в самый верх `(0, 0)`.
+   - *Решение:* Реализована схема с флагом `isSilent`. При первичном открытии показывается статус загрузки, а при сокет-событиях данные синхронизируются в фоне без вмешательства в позицию экрана.
+
+2. **Корректный скролл на разных экранах:**
+   - *Проблема:* Использование жесткой высоты `100vh` приводило к обрезанию контента на смартфонах из-за плавающих панелей браузера.
+   - *Решение:* Логика разделена через медиа-запросы: десктоп изолирует скролл внутри контейнера, а мобильные экраны используют естественный поток документа.
+
+---
+
+## 💻 Локальный запуск проекта
+
+1. **Клонировать репозиторий:**
+   ```bash
+   git clone [https://github.com/твой-аккаунт/portfolio-crm.git](https://github.com/твой-аккаунт/portfolio-crm.git)
+   cd portfolio-crm
